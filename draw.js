@@ -7,6 +7,7 @@ let panStartX, panStartY;
 let offsetX = 0, offsetY = 0;
 let line = [];
 let color = '#000000';
+let scale = 1;
 
 // Get toolbar buttons
 let drawBtn = document.getElementById('draw-btn');
@@ -21,36 +22,72 @@ eraseBtn.addEventListener('click', function() {
     color = '#FFFFFF'; // Set color to white for erasing
 });
 
-canvas.addEventListener('mousedown', function(e) {
-  if (e.button === 2) { // Right click
-      drawing = false;
-      panning = true;
-      panStartX = e.clientX;
-      panStartY = e.clientY;
-  } else { // Left click
-      drawing = true;
-      ctx.beginPath();  // Start a new path
-      justPanned = false;
-      let x = e.clientX - canvas.offsetLeft;
-      let y = e.clientY - canvas.offsetTop;
-      line.push({x: x - offsetX, y: y - offsetY, color: color, move: true});
-  }
+canvas.addEventListener('wheel', function(e) {
+    e.preventDefault();
+
+    // Get mouse position
+    const clientX = e.clientX - canvas.offsetLeft;
+    const clientY = e.clientY - canvas.offsetTop;
+
+    // Calculate the position in the unscaled canvas
+    const x = (clientX - offsetX) / scale;
+    const y = (clientY - offsetY) / scale;
+
+    // Calculate the zoom factor
+    let scaleFactor = e.deltaY < 0 ? 1.1 : 1 / 1.1;
+
+    // Update the scale
+    scale *= scaleFactor;
+
+    // Update offset
+    offsetX = clientX - x * scale;
+    offsetY = clientY - y * scale;
+
+    // Redraw everything
+    drawAll();
 });
+
+
+
+
+
+canvas.addEventListener('mousedown', function(e) {
+    if (e.button === 2) {
+        panning = true;
+    } else if (e.button === 0) {
+        drawing = true;
+        let mouseX = (e.clientX - canvas.offsetLeft - offsetX) / scale;
+        let mouseY = (e.clientY - canvas.offsetTop - offsetY) / scale;
+        line.push({
+            x: mouseX,
+            y: mouseY,
+            color: color,
+            move: true
+        });
+    }
+});
+
 
 
 
 canvas.addEventListener('mousemove', function(e) {
-    if (drawing) {
-        draw(e);
-    } else if (panning) {
-        offsetX += e.clientX - panStartX;
-        offsetY += e.clientY - panStartY;
-        panStartX = e.clientX;
-        panStartY = e.clientY;
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
+    if (panning) {
+        offsetX += e.movementX;
+        offsetY += e.movementY;
+        drawAll();
+    } else if (drawing) {
+        let mouseX = (e.clientX - canvas.offsetLeft - offsetX) / scale;
+        let mouseY = (e.clientY - canvas.offsetTop - offsetY) / scale;
+        line.push({
+            x: mouseX,
+            y: mouseY,
+            color: color,
+            move: false
+        });
         drawAll();
     }
 });
+
 
 canvas.addEventListener('mouseup', function(e) {
   if (e.button === 2) { // Right click
@@ -90,6 +127,9 @@ function draw(e) {
 
 function drawAll() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.save();
+    ctx.translate(offsetX, offsetY);
+    ctx.scale(scale, scale);
     for (let i = 0; i < line.length; i++) {
         let point = line[i];
         ctx.lineWidth = 5;
@@ -97,13 +137,16 @@ function drawAll() {
         ctx.strokeStyle = point.color;
         if (point.move) {
             ctx.beginPath();
-            ctx.moveTo(point.x + offsetX, point.y + offsetY);
+            ctx.moveTo(point.x, point.y);
         } else {
-            ctx.lineTo(point.x + offsetX, point.y + offsetY);
+            ctx.lineTo(point.x, point.y);
             ctx.stroke();
         }
     }
+    ctx.restore();
 }
+
+
 
 function resizeCanvas() {
     canvas.width = window.innerWidth;
