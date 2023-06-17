@@ -1,17 +1,40 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Whiteboard</title>
         <style>
-            #draw-area {
-                border: 1px solid black;
+            body, html {
+                height: 100%;
+                margin: 0;
+                padding: 0;
+                overflow: hidden;
+            }
+            #canvas {
+                position: absolute;
+                top: 30px; /* Height of the toolbar */
+                left: 0;
+                width: 100%;
+                height: calc(100% - 30px); /* Subtract the height of the toolbar */
+            }
+            #toolbar {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 30px;
+                background-color: #f0f0f0;
+            }
+            .toolbar-button {
+                height: 100%;
+                padding: 5px;
             }
         </style>
     </head>
     <body>
-        <button id="pen">Pen</button>
-        <button id="eraser">Eraser</button>
-        <canvas id="draw-area" width="800" height="600"></canvas>
+        <div id="toolbar">
+            <button id="draw-btn" class="toolbar-button">Draw</button>
+            <button id="erase-btn" class="toolbar-button">Erase</button>
+        </div>
+        <canvas id="canvas"></canvas>
         <script src="draw.js"></script>
     </body>
 </html>
