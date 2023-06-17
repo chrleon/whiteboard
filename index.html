@@ -1,28 +1,31 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <style>
-            body, html {
-                height: 100%;
-                margin: 0;
-                padding: 0;
-                overflow: hidden;
-            }
-            #canvas {
-                position: absolute;
-                top: 30px; /* Height of the toolbar */
-                left: 0;
-                width: 100%;
-                height: calc(100% - 30px); /* Subtract the height of the toolbar */
-            }
-            #toolbar {
-                position: absolute;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 30px;
-                background-color: #f0f0f0;
-            }
+<head>
+    <style>
+        body, html {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+        #canvas {
+            position: absolute;
+            top: 0; /* Height of the toolbar */
+            left: 0;
+            width: 100%;
+            height: 100vh;
+        }
+        #toolbar {
+            position: absolute;
+            top: 1rem;
+            left: 1rem;
+            width: 100%;
+            height: 3rem;
+            background-color: #f0f0f0;
+            backdrop-filter: blur(9px);
+            background-color: hsla(0, 0%, 100%,0.4);
+            padding: 1rem;
+            border: 2px solid hsla(0,0%,100%,0.5);            }
             .toolbar-button {
                 height: 100%;
                 padding: 5px;
@@ -30,11 +33,12 @@
         </style>
     </head>
     <body>
+        <canvas id="canvas"></canvas>
         <div id="toolbar">
             <button id="draw-btn" class="toolbar-button">Draw</button>
             <button id="erase-btn" class="toolbar-button">Erase</button>
+            Left click to draw, right click to move the canvas
         </div>
-        <canvas id="canvas"></canvas>
         <script src="draw.js"></script>
     </body>
-</html>
+    </html>
